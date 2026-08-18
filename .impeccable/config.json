@@ -1,0 +1,41 @@
+{
+  "_comment": "Brand whitelist for aibrain. The product hue is the brand, not AI slop. Read by .claude/hooks/frontend_design_gate.py via the vendored impeccable detector.",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "ai-color-palette",
+        "value": "#6366f1",
+        "files": [
+          "src/**"
+        ],
+        "reason": "aibrain brand colour, locked in src/config/site.ts"
+      },
+      {
+        "rule": "ai-color-palette",
+        "value": "#e0e7ff",
+        "files": [
+          "src/**"
+        ],
+        "reason": "aibrain brand colour, locked in src/config/site.ts"
+      },
+      {
+        "rule": "ai-color-palette",
+        "value": "#6366f1",
+        "files": [
+          "src/**"
+        ],
+        "reason": "aibrain brand colour, locked in src/config/site.ts"
+      },
+      {
+        "rule": "ai-color-palette",
+        "value": "#4338ca",
+        "files": [
+          "src/**"
+        ],
+        "reason": "aibrain brand colour, locked in src/config/site.ts"
+      }
+    ]
+  }
+}

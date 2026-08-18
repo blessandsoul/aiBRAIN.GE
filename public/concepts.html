@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>aiBRAIN — WhatsApp Web კომპანიის ცოდნის ბაზა</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Geist+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    :root {
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-display: 'Bricolage Grotesque', sans-serif;
+      --font-mono: 'Geist Mono', monospace;
+      
+      /* WhatsApp Web Exact Native Palette */
+      --wa-green-header: #00a884;
+      --wa-bg-outer: #d1d7db;
+      --wa-bg-topbar: #00a884;
+      --wa-panel-bg: #ffffff;
+      --wa-sidebar-header: #f0f2f5;
+      --wa-chat-header: #f0f2f5;
+      --wa-chat-bg: #efeae2;
+      --wa-search-bg: #f0f2f5;
+      --wa-border: #e9edef;
+      --wa-border-subtle: #f2f2f2;
+      
+      --wa-text-primary: #111b21;
+      --wa-text-secondary: #667781;
+      --wa-text-muted: #8696a0;
+      
+      --wa-bubble-in: #ffffff;
+      --wa-bubble-out: #d9fdd3;
+      --wa-bubble-border: #bbf7d0;
+      
+      --wa-blue-ticks: #53bdeb;
+      --wa-green-unread: #25d366;
+      --wa-green-dark: #008069;
+      
+      --radius-app: 12px;
+      --shadow-wa-web: 0 17px 50px 0 rgba(11,20,26,.19), 0 12px 15px 0 rgba(11,20,26,.24);
+      --spring: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-main);
+      background: #eef2f5;
+      color: var(--wa-text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 60px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* WhatsApp Web top green bar */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 128px;
+      background: var(--wa-bg-topbar);
+      z-index: 0;
+    }
+
+    /* ── Header ── */
+    .hero-header {
+      text-align: center;
+      max-width: 860px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--wa-green-dark);
+      margin-bottom: 10px;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--wa-green-unread);
+      box-shadow: 0 0 8px var(--wa-green-unread);
+      animation: livePulse 2s infinite;
+    }
+
+    @keyframes livePulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.5; }
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(26px, 3.8vw, 38px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: #ffffff;
+      margin-bottom: 8px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+
+    .hero-subtitle {
+      font-size: 14.5px;
+      color: #f1f5f9;
+      max-width: 700px;
+      margin: 0 auto 14px;
+      line-height: 1.5;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    /* ── 4-Step Narrative Bar (Solar Icons) ── */
+    .narrative-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .narrative-step {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid var(--wa-border);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--wa-text-primary);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+    }
+
+    .narrative-step svg {
+      width: 15px;
+      height: 15px;
+      color: var(--wa-green-dark);
+      flex: none;
+    }
+
+    .narrative-step.final {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      color: #15803d;
+    }
+
+    .narrative-step.final svg {
+      color: #15803d;
+    }
+
+    .narrative-arrow {
+      color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+    }
+
+    .narrative-arrow svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ── Main WhatsApp Web App Container ── */
+    .whatsapp-web-window {
+      width: 100%;
+      max-width: 880px;
+      height: 520px;
+      background: #ffffff;
+      border-radius: var(--radius-app);
+      box-shadow: var(--shadow-wa-web);
+      display: grid;
+      grid-template-columns: 310px 1fr;
+      overflow: hidden;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (max-width: 720px) {
+      .whatsapp-web-window {
+        grid-template-columns: 1fr;
+        height: 560px;
+      }
+      .whatsapp-sidebar {
+        display: none;
+      }
+    }
+
+    /* ── Left Sidebar (WhatsApp Web List) ── */
+    .whatsapp-sidebar {
+      background: #ffffff;
+      border-right: 1px solid var(--wa-border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sidebar Top Header */
+    .sidebar-top-bar {
+      height: 54px;
+      background: var(--wa-sidebar-header);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--wa-border);
+    }
+
+    .user-profile-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #008069;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-profile-avatar svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .sidebar-top-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: var(--wa-text-secondary);
+    }
+
+    .sidebar-top-actions svg {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    /* Search Bar */
+    .sidebar-search-container {
+      padding: 7px 12px;
+      border-bottom: 1px solid var(--wa-border);
+      background: #ffffff;
+    }
+
+    .search-input-pill {
+      background: var(--wa-search-bg);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      padding: 6px 12px;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--wa-text-secondary);
+    }
+
+    .search-input-pill svg {
+      width: 15px;
+      height: 15px;
+      color: var(--wa-text-muted);
+    }
+
+    /* Chats List */
+    .sidebar-chats-scroll {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-row-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid #f5f6f6;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      position: relative;
+    }
+
+    .chat-row-item:hover {
+      background: #f5f6f6;
+    }
+
+    .chat-row-item.active {
+      background: #f0f2f5;
+    }
+
+    .chat-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      color: #ffffff;
+    }
+
+    .chat-avatar.sales { background: #008069; }
+    .chat-avatar.support { background: #3b82f6; }
+    .chat-avatar.reception { background: #8b5cf6; }
+    .chat-avatar.warehouse { background: #d97706; }
+
+    .chat-avatar svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .chat-row-body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .chat-row-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-row-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--wa-text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chat-row-time {
+      font-size: 10px;
+      color: var(--wa-text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .chat-row-time.unread {
+      color: var(--wa-green-dark);
+      font-weight: 700;
+    }
+
+    .chat-row-snippet-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .chat-row-snippet {
+      font-size: 11.5px;
+      color: var(--wa-text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 175px;
+    }
+
+    .unread-pill {
+      background: var(--wa-green-unread);
+      color: #ffffff;
+      font-size: 9.5px;
+      font-weight: 800;
+      min-width: 17px;
+      height: 17px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
+
+    /* ── Right Main Area (WhatsApp Web Conversation) ── */
+    .whatsapp-main-chat {
+      background: var(--wa-chat-bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background-image: radial-gradient(#d1d7db 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    /* Chat Top Bar */
+    .main-chat-header {
+      height: 54px;
+      background: var(--wa-chat-header);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--wa-border);
+      z-index: 2;
+    }
+
+    .main-chat-identity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .main-chat-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #008069;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+    }
+
+    .main-chat-avatar svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .main-chat-titles h3 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--wa-text-primary);
+      line-height: 1.2;
+    }
+
+    .main-chat-titles span {
+      font-size: 11px;
+      color: var(--wa-green-dark);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .main-chat-titles span svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .main-chat-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--wa-text-secondary);
+    }
+
+    .main-chat-actions svg {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    /* Message Stream */
+    .chat-messages-container {
+      flex: 1;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      justify-content: flex-end;
+    }
+
+    .date-separator-pill {
+      align-self: center;
+      background: #ffffff;
+      padding: 4px 12px;
+      border-radius: 7.5px;
+      font-size: 10.5px;
+      color: var(--wa-text-secondary);
+      box-shadow: 0 1px 1px rgba(11,20,26,.1);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    /* WhatsApp Authentic Message Bubbles */
+    .msg-bubble {
+      max-width: 82%;
+      padding: 7px 10px 6px;
+      border-radius: 7.5px;
+      position: relative;
+      box-shadow: 0 1px 0.5px rgba(11,20,26,.13);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 12.5px;
+      line-height: 1.4;
+      transition: all 0.3s var(--spring);
+    }
+
+    .msg-bubble.user-in {
+      align-self: flex-start;
+      background: var(--wa-bubble-in);
+      border-top-left-radius: 0;
+    }
+
+    .msg-bubble.ai-out {
+      align-self: flex-start;
+      background: var(--wa-bubble-out);
+      border-top-left-radius: 0;
+      border: 1px solid var(--wa-bubble-border);
+    }
+
+    .msg-bubble.system-boss-silent {
+      align-self: center;
+      background: #ffffff;
+      border: 1px dashed #86efac;
+      font-size: 10.5px;
+      color: var(--wa-green-dark);
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .msg-bubble.system-boss-silent svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .sender-title-user {
+      font-size: 11px;
+      font-weight: 700;
+      color: #0284c7;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sender-title-user svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .sender-title-ai {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--wa-green-dark);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sender-title-ai svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    .msg-content-text {
+      color: var(--wa-text-primary);
+      font-weight: 400;
+    }
+
+    /* WhatsApp Native Document Attachment Card */
+    .wa-document-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 6px;
+      padding: 7px 10px;
+      margin-top: 3px;
+      border: 1px solid rgba(0, 128, 105, 0.15);
+    }
+
+    .wa-doc-icon {
+      width: 28px;
+      height: 28px;
+      background: var(--wa-green-dark);
+      color: #ffffff;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+    }
+
+    .wa-doc-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .wa-doc-meta {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .wa-doc-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--wa-text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .wa-doc-size {
+      font-size: 9.5px;
+      color: var(--wa-text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    .msg-timestamp-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 3px;
+      font-size: 10px;
+      color: var(--wa-text-muted);
+      margin-top: 1px;
+    }
+
+    .double-blue-ticks {
+      color: var(--wa-blue-ticks);
+      display: flex;
+      align-items: center;
+    }
+
+    /* Animated WhatsApp Typing Bubble */
+    .typing-bubble {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #ffffff;
+      border-radius: 7.5px;
+      width: fit-content;
+      box-shadow: 0 1px 0.5px rgba(11,20,26,.13);
+      font-size: 11px;
+      color: var(--wa-green-dark);
+      font-weight: 600;
+    }
+
+    .typing-bubble.active {
+      display: flex;
+    }
+
+    .typing-dots {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .typing-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--wa-green-dark);
+      animation: bounceDot 1.2s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounceDot {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+      40% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* WhatsApp Bottom Input Bar */
+    .main-chat-input-bar {
+      height: 54px;
+      background: var(--wa-chat-header);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-top: 1px solid var(--wa-border);
+    }
+
+    .main-chat-input-bar svg {
+      width: 20px;
+      height: 20px;
+      color: var(--wa-text-secondary);
+      flex: none;
+      cursor: pointer;
+    }
+
+    .wa-input-pill {
+      flex: 1;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12.5px;
+      color: var(--wa-text-secondary);
+      border: 1px solid var(--wa-border);
+    }
+
+    /* ── Controls Deck Below WhatsApp ── */
+    .app-controls-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0 0;
+      gap: 10px;
+      max-width: 880px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: var(--font-main);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--wa-text-primary);
+      cursor: pointer;
+      transition: all 0.15s var(--spring);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .action-btn:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .action-btn:active {
+      transform: scale(0.97);
+    }
+
+    .action-btn svg {
+      width: 14px;
+      height: 14px;
+      flex: none;
+    }
+
+    .action-btn.primary {
+      background: var(--wa-green-dark);
+      color: #ffffff;
+      border-color: var(--wa-green-dark);
+    }
+
+    .action-btn.primary:hover {
+      background: #006a57;
+    }
+
+    /* ── 3 Big Value Props Below ── */
+    .benefits-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 880px;
+      width: 100%;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 640px) {
+      .benefits-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .benefit-box {
+      background: #ffffff;
+      border: 1px solid var(--wa-border);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    .benefit-box-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--wa-text-primary);
+    }
+
+    .benefit-box-head svg {
+      width: 17px;
+      height: 17px;
+      color: var(--wa-green-dark);
+      flex: none;
+    }
+
+    .benefit-box p {
+      font-size: 11.5px;
+      color: var(--wa-text-secondary);
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header (Georgian) -->
+  <header class="hero-header">
+    <div class="badge-pill">
+      <span class="live-dot"></span>
+      <span>aiBRAIN · WhatsApp & Telegram კომპანიის ცოდნის ბაზა</span>
+    </div>
+    <h1 class="hero-title">
+      თანამშრომლები შეფს აღარ აწუხებენ. <br>
+      aiBRAIN მათ სამუშაო ჩათებში პასუხობს.
+    </h1>
+    <p class="hero-subtitle">
+      შეფი ერთხელ ავსებს კომპანიის რეგლამენტებსა და ფასებს. თანამშრომელი სვამს კითხვას ნებისმიერ სამუშაო ჩათში — aiBRAIN მყისიერად აწვდის ზუსტ პასუხს ოფიციალური რეგლამენტით, შეფის ტელეფონი კი დუმს.
+    </p>
+
+    <!-- 4-Step Narrative Explainer (Solar Icons aiNOW in Georgian) -->
+    <div class="narrative-bar">
+      <div class="narrative-step">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1S1 5.925 1 12c0 1.76.413 3.423 1.148 4.898c.195.392.26.84.147 1.263l-.655 2.448a1.43 1.43 0 0 0 1.75 1.751l2.45-.655a1.8 1.8 0 0 1 1.262.147A10.96 10.96 0 0 0 12 23" opacity=".5"/><path fill="currentColor" d="M10.9 12a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m-4.4 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m8.8 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0"/></svg>
+        <span>1. თანამშრომელი წერს WhatsApp-ში</span>
+      </div>
+      <span class="narrative-arrow">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M3.25 12a.75.75 0 0 1 .75-.75h9.25v1.5H4a.75.75 0 0 1-.75-.75" clip-rule="evenodd" opacity=".5"/><path fill="currentColor" d="M13.25 12.75V18a.75.75 0 0 0 1.28.53l6-6a.75.75 0 0 0 0-1.06l-6-6a.75.75 0 0 0-1.28.53z"/></svg>
+      </span>
+      <div class="narrative-step">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 10c4.418 0 8-1.79 8-4s-3.582-4-8-4s-8 1.79-8 4s3.582 4 8 4"/><path fill="currentColor" d="M4 12v6c0 2.21 3.582 4 8 4s8-1.79 8-4v-6c0 2.21-3.582 4-8 4s-8-1.79-8-4" opacity=".5"/><path fill="currentColor" d="M4 6v6c0 2.21 3.582 4 8 4s8-1.79 8-4V6c0 2.21-3.582 4-8 4S4 8.21 4 6" opacity=".7"/></svg>
+        <span>2. Brain ამოწმებს 0.2 წამში</span>
+      </div>
+      <span class="narrative-arrow">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M3.25 12a.75.75 0 0 1 .75-.75h9.25v1.5H4a.75.75 0 0 1-.75-.75" clip-rule="evenodd" opacity=".5"/><path fill="currentColor" d="M13.25 12.75V18a.75.75 0 0 0 1.28.53l6-6a.75.75 0 0 0 0-1.06l-6-6a.75.75 0 0 0-1.28.53z"/></svg>
+      </span>
+      <div class="narrative-step">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 10c0-3.771 0-5.657 1.172-6.828S7.229 2 11 2h2c3.771 0 5.657 0 6.828 1.172S21 6.229 21 10v4c0 3.771 0 5.657-1.172 6.828S16.771 22 13 22h-2c-3.771 0-5.657 0-6.828-1.172S3 17.771 3 14z" opacity=".5"/><path fill="currentColor" fill-rule="evenodd" d="M7.25 12a.75.75 0 0 1 .75-.75h8a.75.75 0 0 1 0 1.5H8a.75.75 0 0 1-.75-.75m0-4A.75.75 0 0 1 8 7.25h8a.75.75 0 0 1 0 1.5H8A.75.75 0 0 1 7.25 8m0 8a.75.75 0 0 1 .75-.75h5a.75.75 0 0 1 0 1.5H8a.75.75 0 0 1-.75-.75" clip-rule="evenodd"/></svg>
+        <span>3. პასუხი + PDF რეგლამენტი</span>
+      </div>
+      <span class="narrative-arrow">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M3.25 12a.75.75 0 0 1 .75-.75h9.25v1.5H4a.75.75 0 0 1-.75-.75" clip-rule="evenodd" opacity=".5"/><path fill="currentColor" d="M13.25 12.75V18a.75.75 0 0 0 1.28.53l6-6a.75.75 0 0 0 0-1.06l-6-6a.75.75 0 0 0-1.28.53z"/></svg>
+      </span>
+      <div class="narrative-step final">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3.378 5.082C3 5.62 3 7.22 3 10.417v1.574c0 5.638 4.239 8.375 6.899 9.536c.721.315 1.082.473 2.101.473c1.02 0 1.38-.158 2.101-.473C16.761 20.365 21 17.63 21 11.991v-1.574c0-3.198 0-4.797-.378-5.335c-.377-.537-1.88-1.052-4.887-2.081l-.573-.196C13.595 2.268 12.812 2 12 2s-1.595.268-3.162.805L8.265 3c-3.007 1.03-4.51 1.545-4.887 2.082" opacity=".5"/><path fill="currentColor" d="M15.06 10.5a.75.75 0 0 0-1.12-1l-3.011 3.374l-.87-.974a.75.75 0 0 0-1.118 1l1.428 1.6a.75.75 0 0 0 1.119 0z"/></svg>
+        <span>4. შეფი მშვიდადაა (0 ზარი)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── 1:1 WhatsApp Web App Shell ── -->
+  <div class="whatsapp-web-window">
+
+    <!-- Left Sidebar: Real WhatsApp Chat List -->
+    <aside class="whatsapp-sidebar">
+
+      <!-- Sidebar Top Header -->
+      <div class="sidebar-top-bar">
+        <div class="user-profile-avatar" title="კომპანიის ხელმძღვანელი">
+          <svg viewBox="0 0 24 24"><circle cx="15" cy="6" r="3" fill="currentColor" opacity=".4"/><ellipse cx="16" cy="17" fill="currentColor" opacity=".4" rx="5" ry="3"/><circle cx="9.001" cy="6" r="4" fill="currentColor"/><ellipse cx="9.001" cy="17.001" fill="currentColor" rx="7" ry="4"/></svg>
+        </div>
+        <div class="sidebar-top-actions">
+          <!-- Status -->
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+          <!-- New Chat -->
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1S1 5.925 1 12c0 1.76.413 3.423 1.148 4.898c.195.392.26.84.147 1.263l-.655 2.448a1.43 1.43 0 0 0 1.75 1.751l2.45-.655a1.8 1.8 0 0 1 1.262.147A10.96 10.96 0 0 0 12 23"/></svg>
+          <!-- Menu 3 dots -->
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg>
+        </div>
+      </div>
+
+      <!-- Search Input Box -->
+      <div class="sidebar-search-container">
+        <div class="search-input-pill">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10" opacity=".5"/><path fill="currentColor" d="M11.126 6.823a5.249 5.249 0 1 1-3.636 2.49l.708.574A4.35 4.35 0 1 0 12 7.65a.75.75 0 0 0 0 1.5a2.85 2.85 0 1 1-2.609 1.703l2.137 1.73a.75.75 0 0 0 .944-1.166L8.274 8.019c-.561-.454-1.465-.412-1.918.279a6.749 6.749 0 1 0 4.519-2.953a.75.75 0 0 0 .25 1.478"/></svg>
+          <span>ძიება ან ახალი ჩათი</span>
+        </div>
+      </div>
+
+      <!-- Chats Scroll List -->
+      <div class="sidebar-chats-scroll">
+
+        <!-- Chat 1: Sales -->
+        <div class="chat-row-item active" onclick="switchDeptChat(0)">
+          <div class="chat-avatar sales">
+            <svg viewBox="0 0 24 24"><circle cx="15" cy="6" r="3" fill="currentColor" opacity=".4"/><ellipse cx="16" cy="17" fill="currentColor" opacity=".4" rx="5" ry="3"/><circle cx="9.001" cy="6" r="4" fill="currentColor"/><ellipse cx="9.001" cy="17.001" fill="currentColor" rx="7" ry="4"/></svg>
+          </div>
+          <div class="chat-row-body">
+            <div class="chat-row-header">
+              <span class="chat-row-title">გაყიდვები (B2B)</span>
+              <span class="chat-row-time unread">14:22</span>
+            </div>
+            <div class="chat-row-snippet-row">
+              <span class="chat-row-snippet">ფასდაკლება მკაცრად 12%</span>
+              <span class="unread-pill">1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat 2: Support -->
+        <div class="chat-row-item" onclick="switchDeptChat(1)">
+          <div class="chat-avatar support">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1S1 5.925 1 12c0 1.76.413 3.423 1.148 4.898c.195.392.26.84.147 1.263l-.655 2.448a1.43 1.43 0 0 0 1.75 1.751l2.45-.655a1.8 1.8 0 0 1 1.262.147A10.96 10.96 0 0 0 12 23" opacity=".5"/><path fill="currentColor" d="M10.9 12a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m-4.4 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m8.8 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0"/></svg>
+          </div>
+          <div class="chat-row-body">
+            <div class="chat-row-header">
+              <span class="chat-row-title">სერვისი & დაბრუნება</span>
+              <span class="chat-row-time">14:18</span>
+            </div>
+            <div class="chat-row-snippet-row">
+              <span class="chat-row-snippet">უარი №12 წესის მიხედვით</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat 3: Reception -->
+        <div class="chat-row-item" onclick="switchDeptChat(2)">
+          <div class="chat-avatar reception">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.94 2c.416 0 .753.324.753.724v1.46c.668-.012 1.417-.012 2.26-.012h4.015c.842 0 1.591 0 2.259.013v-1.46c0-.4.337-.725.753-.725s.753.324.753.724V4.25c1.445.111 2.394.384 3.09 1.055c.698.67.982 1.582 1.097 2.972L22 9H2v-.724c.116-1.39.4-2.302 1.097-2.972s1.645-.944 3.09-1.055V2.724c0-.4.337-.724.753-.724"/><path fill="currentColor" d="M22 14v-2c0-.839-.004-2.335-.017-3H2.01c-.013.665-.01 2.161-.01 3v2c0 3.771 0 5.657 1.172 6.828S6.228 22 10 22h4c3.77 0 5.656 0 6.828-1.172S22 17.772 22 14" opacity=".5"/><path fill="currentColor" d="M18 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></svg>
+          </div>
+          <div class="chat-row-body">
+            <div class="chat-row-header">
+              <span class="chat-row-title">რეზეფშენი & ჩაწერა</span>
+              <span class="chat-row-time">14:10</span>
+            </div>
+            <div class="chat-row-snippet-row">
+              <span class="chat-row-snippet">14:00 თავისუფალია, 50 GEL</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat 4: Logistics -->
+        <div class="chat-row-item" onclick="switchDeptChat(3)">
+          <div class="chat-avatar warehouse">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M1 12c0-5.185 0-7.778 1.61-9.39C4.223 1 6.816 1 12 1s7.778 0 9.39 1.61C23 4.223 23 6.816 23 12s0 7.778-1.61 9.39C19.777 23 17.184 23 12 23s-7.778 0-9.39-1.61C1 19.777 1 17.184 1 12" opacity=".5"/><path fill="currentColor" d="M2.61 21.389c1.612 1.61 4.205 1.61 9.39 1.61s7.778 0 9.39-1.61c1.492-1.493 1.601-3.829 1.61-8.29h-3.476c-.996 0-1.494 0-1.931.202c-.438.201-.762.58-1.41 1.335l-.666.777c-.648.756-.972 1.134-1.41 1.335s-.935.202-1.93.202h-.353c-.996 0-1.494 0-1.931-.202c-.438-.2-.762-.579-1.41-1.335l-.666-.777c-.648-.756-.972-1.134-1.41-1.335s-.935-.201-1.93-.201H1c.008 4.46.118 6.796 1.61 8.289"/></svg>
+          </div>
+          <div class="chat-row-body">
+            <div class="chat-row-header">
+              <span class="chat-row-title">საწყობი & მიწოდება</span>
+              <span class="chat-row-time">13:55</span>
+            </div>
+            <div class="chat-row-snippet-row">
+              <span class="chat-row-snippet">ტარიფი 25 GEL</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </aside>
+
+    <!-- Right Main Area: Authentic WhatsApp Web Chat Stream -->
+    <main class="whatsapp-main-chat">
+
+      <!-- Chat Top Header -->
+      <div class="main-chat-header">
+        <div class="main-chat-identity">
+          <div class="main-chat-avatar" id="main-avatar">
+            <svg viewBox="0 0 24 24"><circle cx="15" cy="6" r="3" fill="currentColor" opacity=".4"/><ellipse cx="16" cy="17" fill="currentColor" opacity=".4" rx="5" ry="3"/><circle cx="9.001" cy="6" r="4" fill="currentColor"/><ellipse cx="9.001" cy="17.001" fill="currentColor" rx="7" ry="4"/></svg>
+          </div>
+          <div class="main-chat-titles">
+            <h3 id="active-chat-title">გაყიდვების განყოფილება (B2B)</h3>
+            <span>
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10" opacity=".5"/><path fill="currentColor" d="M16.03 8.97a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 1 1 1.06-1.06l1.47 1.47l2.235-2.235L14.97 8.97a.75.75 0 0 1 1.06 0"/></svg>
+              aiBRAIN ჩართულია (პასუხობს შეფის ნაცვლად)
+            </span>
+          </div>
+        </div>
+
+        <div class="main-chat-actions">
+          <!-- Search -->
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10" opacity=".5"/><path fill="currentColor" d="M11.126 6.823a5.249 5.249 0 1 1-3.636 2.49l.708.574A4.35 4.35 0 1 0 12 7.65a.75.75 0 0 0 0 1.5a2.85 2.85 0 1 1-2.609 1.703l2.137 1.73a.75.75 0 0 0 .944-1.166L8.274 8.019c-.561-.454-1.465-.412-1.918.279a6.749 6.749 0 1 0 4.519-2.953a.75.75 0 0 0 .25 1.478"/></svg>
+          <!-- Clip -->
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <!-- 3 dots -->
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg>
+        </div>
+      </div>
+
+      <!-- Messages Stream Area -->
+      <div class="chat-messages-container" id="messages-stream">
+        <div class="date-separator-pill">დღეს</div>
+
+        <!-- 1. Incoming Message from Employee -->
+        <div class="msg-bubble user-in" id="bubble-user">
+          <div class="sender-title-user" id="user-sender-title">
+            <svg viewBox="0 0 24 24"><circle cx="15" cy="6" r="3" fill="currentColor" opacity=".4"/><ellipse cx="16" cy="17" fill="currentColor" opacity=".4" rx="5" ry="3"/><circle cx="9.001" cy="6" r="4" fill="currentColor"/><ellipse cx="9.001" cy="17.001" fill="currentColor" rx="7" ry="4"/></svg>
+            <span id="user-sender-name">ანა (გაყიდვების მენეჯერი)</span>
+          </div>
+          <div class="msg-content-text" id="user-msg-text">
+            «შეფ, კლიენტი ხაზზეა და 50 ცალ პარტიაზე 15%-იან ფასდაკლებას ითხოვს. ვუთანხმებთ თუ უარს ვეუბნებით?»
+          </div>
+          <div class="msg-timestamp-row">
+            <span id="user-msg-time">14:22</span>
+          </div>
+        </div>
+
+        <!-- Animated Typing Indicator -->
+        <div class="typing-bubble" id="typing-bubble">
+          <span>aiBRAIN ამოწმებს ბაზას</span>
+          <div class="typing-dots">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+          </div>
+        </div>
+
+        <!-- 2. Verified AI Outgoing Response -->
+        <div class="msg-bubble ai-out" id="bubble-ai">
+          <div class="sender-title-ai">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 10c4.418 0 8-1.79 8-4s-3.582-4-8-4s-8 1.79-8 4s3.582 4 8 4"/><path fill="currentColor" d="M4 12v6c0 2.21 3.582 4 8 4s8-1.79 8-4v-6c0 2.21-3.582 4-8 4s-8-1.79-8-4" opacity=".5"/><path fill="currentColor" d="M4 6v6c0 2.21 3.582 4 8 4s8-1.79 8-4V6c0 2.21-3.582 4-8 4S4 8.21 4 6" opacity=".7"/></svg>
+            <span>aiBRAIN (კომპანიის ცოდნის ბაზა)</span>
+          </div>
+          <div class="msg-content-text" id="ai-msg-text">
+            «კომერციული რეგლამენტის №4-ის მიხედვით, 50 ერთეულზე ავტომატური ფასდაკლება შეადგენს მკაცრად 12%-ს. 15%-ზე მეტი ფასდაკლება მოითხოვს CFO-სთან პირად შეთანხმებას.»
+          </div>
+          
+          <!-- Attached Official PDF Document Card -->
+          <div class="wa-document-card">
+            <div class="wa-doc-icon">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 10c0-3.771 0-5.657 1.172-6.828S7.229 2 11 2h2c3.771 0 5.657 0 6.828 1.172S21 6.229 21 10v4c0 3.771 0 5.657-1.172 6.828S16.771 22 13 22h-2c-3.771 0-5.657 0-6.828-1.172S3 17.771 3 14z" opacity=".5"/><path fill="currentColor" fill-rule="evenodd" d="M7.25 12a.75.75 0 0 1 .75-.75h8a.75.75 0 0 1 0 1.5H8a.75.75 0 0 1-.75-.75m0-4A.75.75 0 0 1 8 7.25h8a.75.75 0 0 1 0 1.5H8A.75.75 0 0 1 7.25 8m0 8a.75.75 0 0 1 .75-.75h5a.75.75 0 0 1 0 1.5H8a.75.75 0 0 1-.75-.75" clip-rule="evenodd"/></svg>
+            </div>
+            <div class="wa-doc-meta">
+              <span class="wa-doc-name" id="wa-doc-filename">რეგლამენტი_№4_ფასდაკლებები_2026.pdf</span>
+              <span class="wa-doc-size">1.8 MB · ოფიციალური რეგლამენტი</span>
+            </div>
+          </div>
+
+          <div class="msg-timestamp-row">
+            <span>14:22</span>
+            <span class="double-blue-ticks">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- 3. System Boss Silent Badge -->
+        <div class="msg-bubble system-boss-silent">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3.378 5.082C3 5.62 3 7.22 3 10.417v1.574c0 5.638 4.239 8.375 6.899 9.536c.721.315 1.082.473 2.101.473c1.02 0 1.38-.158 2.101-.473C16.761 20.365 21 17.63 21 11.991v-1.574c0-3.198 0-4.797-.378-5.335c-.377-.537-1.88-1.052-4.887-2.081l-.573-.196C13.595 2.268 12.812 2 12 2s-1.595.268-3.162.805L8.265 3c-3.007 1.03-4.51 1.545-4.887 2.082" opacity=".5"/><path fill="currentColor" d="M15.06 10.5a.75.75 0 0 0-1.12-1l-3.011 3.374l-.87-.974a.75.75 0 0 0-1.118 1l1.428 1.6a.75.75 0 0 0 1.119 0z"/></svg>
+          <span>შეფი არ შეწუხებულა • საკითხი დაიხურა 0.22 წამში</span>
+        </div>
+
+      </div>
+
+      <!-- Bottom WhatsApp Input Bar -->
+      <div class="main-chat-input-bar">
+        <!-- Smiley -->
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1S1 5.925 1 12c0 1.76.413 3.423 1.148 4.898c.195.392.26.84.147 1.263l-.655 2.448a1.43 1.43 0 0 0 1.75 1.751l2.45-.655a1.8 1.8 0 0 1 1.262.147A10.96 10.96 0 0 0 12 23" opacity=".5"/><path fill="currentColor" d="M10.9 12a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m-4.4 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m8.8 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0"/></svg>
+        <!-- Clip -->
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <div class="wa-input-pill">ჩაწერეთ შეტყობინება...</div>
+        <!-- Send -->
+        <svg viewBox="0 0 24 24" style="color:var(--wa-green-dark);"><path fill="currentColor" fill-rule="evenodd" d="M3.25 12a.75.75 0 0 1 .75-.75h9.25v1.5H4a.75.75 0 0 1-.75-.75" clip-rule="evenodd" opacity=".5"/><path fill="currentColor" d="M13.25 12.75V18a.75.75 0 0 0 1.28.53l6-6a.75.75 0 0 0 0-1.06l-6-6a.75.75 0 0 0-1.28.53z"/></svg>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Controls Deck Below App -->
+  <div class="app-controls-footer">
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="action-btn primary" onclick="cycleDepartment(true)">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12.079 2.25c-4.794 0-8.734 3.663-9.118 8.333H2a.75.75 0 0 0-.528 1.283l1.68 1.666a.75.75 0 0 0 1.056 0l1.68-1.666a.75.75 0 0 0-.528-1.283h-.893c.38-3.831 3.638-6.833 7.612-6.833a7.66 7.66 0 0 1 6.537 3.643a.75.75 0 1 0 1.277-.786A9.16 9.16 0 0 0 12.08 2.25"/><path fill="currentColor" d="M20.841 10.467a.75.75 0 0 0-1.054 0L18.1 12.133a.75.75 0 0 0 .527 1.284h.899c-.381 3.83-3.651 6.833-7.644 6.833a7.7 7.7 0 0 1-6.565-3.644a.75.75 0 1 0-1.276.788a9.2 9.2 0 0 0 7.84 4.356c4.809 0 8.766-3.66 9.151-8.333H22a.75.75 0 0 0 .527-1.284z" opacity=".5"/></svg>
+        <span>სიმულაცია: კითხვა სხვა განყოფილებაში</span>
+      </button>
+      <button class="action-btn" onclick="testShieldUnknown()">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3.378 5.082C3 5.62 3 7.22 3 10.417v1.574c0 5.638 4.239 8.375 6.899 9.536c.721.315 1.082.473 2.101.473c1.02 0 1.38-.158 2.101-.473C16.761 20.365 21 17.63 21 11.991v-1.574c0-3.198 0-4.797-.378-5.335c-.377-.537-1.88-1.052-4.887-2.081l-.573-.196C13.595 2.268 12.812 2 12 2s-1.595.268-3.162.805L8.265 3c-3.007 1.03-4.51 1.545-4.887 2.082" opacity=".5"/><path fill="currentColor" d="M15.06 10.5a.75.75 0 0 0-1.12-1l-3.011 3.374l-.87-.974a.75.75 0 0 0-1.118 1l1.428 1.6a.75.75 0 0 0 1.119 0z"/></svg>
+        <span>ტესტი Shield: არასტანდარტული ქეისი (შეფთან გადაცემა)</span>
+      </button>
+    </div>
+    <div style="font-family:var(--font-mono); font-size:11.5px; color:#475569; font-weight:700;">
+      1 კლიკი = გუნდის 1 პასუხი
+    </div>
+  </div>
+
+  <!-- 3 Big Value Props in Georgian -->
+  <div class="benefits-row">
+    <div class="benefit-box">
+      <div class="benefit-box-head">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 10c4.418 0 8-1.79 8-4s-3.582-4-8-4s-8 1.79-8 4s3.582 4 8 4"/><path fill="currentColor" d="M4 12v6c0 2.21 3.582 4 8 4s8-1.79 8-4v-6c0 2.21-3.582 4-8 4s-8-1.79-8-4" opacity=".5"/><path fill="currentColor" d="M4 6v6c0 2.21 3.582 4 8 4s8-1.79 8-4V6c0 2.21-3.582 4-8 4S4 8.21 4 6" opacity=".7"/></svg>
+        <span>1. წესების ბაზა ერთხელ</span>
+      </div>
+      <p>შეფი ერთხელ ტვირთავს რეგლამენტებს, ფასდაკლებებსა და პრაისებს. აღარ გიწევთ ერთსა და იმავე კითხვებზე დღეში 50-ჯერ პასუხის გაცემა.</p>
+    </div>
+    <div class="benefit-box">
+      <div class="benefit-box-head">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3.172 5.172C2 6.343 2 8.229 2 12s0 5.657 1.172 6.828S6.229 20 10 20h1.5c3.771 0 5.657 0 6.828-1.172S19.5 15.771 19.5 12s0-5.657-1.172-6.828S15.271 4 11.5 4H10C6.229 4 4.343 4 3.172 5.172" opacity=".5"/><path fill="currentColor" d="M19.491 14c.009-.6.009-1.264.009-2c0-.735 0-1.4-.009-2H20c.942 0 1.414 0 1.707.293S22 11.057 22 12s0 1.414-.293 1.707S20.942 14 20 14zm-7.415-4.52a.75.75 0 0 0-1.152-.96l-2.5 3A.75.75 0 0 0 9 12.75h1.899l-1.475 1.77a.75.75 0 0 0 1.152.96l2.5-3a.75.75 0 0 0-.576-1.23h-1.899z"/></svg>
+        <span>2. პასუხი WhatsApp-ში 0.22 წამში</span>
+      </div>
+      <p>თანამშრომელი წერს თავისი განყოფილების სამუშაო ჩათში — Brain მყისიერად აგზავნის ოფიციალურ პასუხს მიბმული რეგლამენტის ფაილით.</p>
+    </div>
+    <div class="benefit-box">
+      <div class="benefit-box-head">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3.378 5.082C3 5.62 3 7.22 3 10.417v1.574c0 5.638 4.239 8.375 6.899 9.536c.721.315 1.082.473 2.101.473c1.02 0 1.38-.158 2.101-.473C16.761 20.365 21 17.63 21 11.991v-1.574c0-3.198 0-4.797-.378-5.335c-.377-.537-1.88-1.052-4.887-2.081l-.573-.196C13.595 2.268 12.812 2 12 2s-1.595.268-3.162.805L8.265 3c-3.007 1.03-4.51 1.545-4.887 2.082" opacity=".5"/><path fill="currentColor" d="M15.06 10.5a.75.75 0 0 0-1.12-1l-3.011 3.374l-.87-.974a.75.75 0 0 0-1.118 1l1.428 1.6a.75.75 0 0 0 1.119 0z"/></svg>
+        <span>3. დაცვა შეცდომებისგან (Shield)</span>
+      </div>
+      <p>თუ წესი ბაზაში არ არის, Brain არ იგონებს პასუხს, არამედ პირადად ხელმძღვანელს უგზავნის კითხვას დიალოგის რეზიუმესთან ერთად.</p>
+    </div>
+  </div>
+
+  <script>
+    const solarIconsSvg = {
+      sales: '<svg viewBox="0 0 24 24"><circle cx="15" cy="6" r="3" fill="currentColor" opacity=".4"/><ellipse cx="16" cy="17" fill="currentColor" opacity=".4" rx="5" ry="3"/><circle cx="9.001" cy="6" r="4" fill="currentColor"/><ellipse cx="9.001" cy="17.001" fill="currentColor" rx="7" ry="4"/></svg>',
+      support: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1S1 5.925 1 12c0 1.76.413 3.423 1.148 4.898c.195.392.26.84.147 1.263l-.655 2.448a1.43 1.43 0 0 0 1.75 1.751l2.45-.655a1.8 1.8 0 0 1 1.262.147A10.96 10.96 0 0 0 12 23" opacity=".5"/><path fill="currentColor" d="M10.9 12a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m-4.4 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0m8.8 0a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 0 0-2.2 0"/></svg>',
+      reception: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.94 2c.416 0 .753.324.753.724v1.46c.668-.012 1.417-.012 2.26-.012h4.015c.842 0 1.591 0 2.259.013v-1.46c0-.4.337-.725.753-.725s.753.324.753.724V4.25c1.445.111 2.394.384 3.09 1.055c.698.67.982 1.582 1.097 2.972L22 9H2v-.724c.116-1.39.4-2.302 1.097-2.972s1.645-.944 3.09-1.055V2.724c0-.4.337-.724.753-.724"/><path fill="currentColor" d="M22 14v-2c0-.839-.004-2.335-.017-3H2.01c-.013.665-.01 2.161-.01 3v2c0 3.771 0 5.657 1.172 6.828S6.228 22 10 22h4c3.77 0 5.656 0 6.828-1.172S22 17.772 22 14" opacity=".5"/><path fill="currentColor" d="M18 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></svg>',
+      warehouse: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M1 12c0-5.185 0-7.778 1.61-9.39C4.223 1 6.816 1 12 1s7.778 0 9.39 1.61C23 4.223 23 6.816 23 12s0 7.778-1.61 9.39C19.777 23 17.184 23 12 23s-7.778 0-9.39-1.61C1 19.777 1 17.184 1 12" opacity=".5"/><path fill="currentColor" d="M2.61 21.389c1.612 1.61 4.205 1.61 9.39 1.61s7.778 0 9.39-1.61c1.492-1.493 1.601-3.829 1.61-8.29h-3.476c-.996 0-1.494 0-1.931.202c-.438.201-.762.58-1.41 1.335l-.666.777c-.648.756-.972 1.134-1.41 1.335s-.935.202-1.93.202h-.353c-.996 0-1.494 0-1.931-.202c-.438-.2-.762-.579-1.41-1.335l-.666-.777c-.648-.756-.972-1.134-1.41-1.335s-.935-.201-1.93-.201H1c.008 4.46.118 6.796 1.61 8.289"/></svg>'
+    };
+
+    const deptChats = [
+      {
+        title: 'გაყიდვების განყოფილება (B2B)',
+        avatarClass: 'sales',
+        avatarKey: 'sales',
+        sender: 'ანა (გაყიდვების მენეჯერი)',
+        userMsg: '«შეფ, კლიენტი ხაზზეა და 50 ცალ პარტიაზე 15%-იან ფასდაკლებას ითხოვს. ვუთანხმებთ თუ უარს ვეუბნებით?»',
+        aiMsg: '«კომერციული რეგლამენტის №4-ის მიხედვით, 50 ერთეულზე ავტომატური ფასდაკლება შეადგენს მკაცრად 12%-ს. 15%-ზე მეტი ფასდაკლება მოითხოვს CFO-სთან პირად შეთანხმებას.»',
+        cite: 'რეგლამენტი_№4_ფასდაკლებები_2026.pdf',
+        time: '14:22'
+      },
+      {
+        title: 'მომსახურება და დაბრუნებები',
+        avatarClass: 'support',
+        avatarKey: 'support',
+        sender: 'დავითი (მხარდაჭერის გუნდი)',
+        userMsg: '«მომხმარებელმა ნივთი მე-16 დღეს მოიტანა და თანხის დაბრუნებას ითხოვს. დავუბრუნოთ?»',
+        aiMsg: '«უარი. კანონისა და რეგლამენტის №12-ის მიხედვით, ხარისხიანი ნივთის დაბრუნება შესაძლებელია მკაცრად 14 დღის განმავლობაში სალაროს ჩეკით.»',
+        cite: 'რეგლამენტი_№12_დაბრუნებები.pdf',
+        time: '14:18'
+      },
+      {
+        title: 'რეზეფშენი და ჩაწერა',
+        avatarClass: 'reception',
+        avatarKey: 'reception',
+        sender: 'ნინო (კლინიკის ადმინისტრატორი)',
+        userMsg: '«შეფ, ხვალ 14:00 საათზე ფანჯარა თავისუფალია და რა ღირს პირველადი ვიზიტი სპეციალისტთან?»',
+        aiMsg: '«დიახ, ხვალ 14:00 თავისუფალია. პირველადი ვიზიტის ღირებულებაა 50 GEL. სლოტი დაჯავშნილია Google Calendar-ში.»',
+        cite: 'Google_Calendar_პრაისი_2026.pdf',
+        time: '14:10'
+      },
+      {
+        title: 'საწყობი და მიწოდება',
+        avatarClass: 'warehouse',
+        avatarKey: 'warehouse',
+        sender: 'გიორგი (საწყობის უფროსი)',
+        userMsg: '«რა ტარიფია ბათუმში 24 საათში ექსპრეს-მიწოდებაზე 4 კგ-იან ამანათზე?»',
+        aiMsg: '«ფიქსირებული ტარიფი 25 GEL 5 კგ-მდე ამანათებზე ექსპრეს-მიწოდებისას. კურიერი დანიშნულია სისტემაში.»',
+        cite: 'ტარიფები_ლოგისტიკა_2026.pdf',
+        time: '13:55'
+      }
+    ];
+
+    let currentChatIdx = 0;
+
+    function switchDeptChat(idx, withAnimation = true) {
+      currentChatIdx = idx;
+      const data = deptChats[idx];
+
+      // Update sidebar active row
+      document.querySelectorAll('.chat-row-item').forEach((item, i) => {
+        item.classList.toggle('active', i === idx);
+      });
+
+      // Update Header
+      const av = document.getElementById('main-avatar');
+      av.className = `main-chat-avatar ${data.avatarClass}`;
+      av.innerHTML = solarIconsSvg[data.avatarKey];
+      document.getElementById('active-chat-title').innerText = data.title;
+
+      const userBubble = document.getElementById('bubble-user');
+      const aiBubble = document.getElementById('bubble-ai');
+      const typingBubble = document.getElementById('typing-bubble');
+
+      if (withAnimation) {
+        aiBubble.style.display = 'none';
+        typingBubble.classList.add('active');
+
+        document.getElementById('user-sender-name').innerText = data.sender;
+        document.getElementById('user-msg-text').innerText = data.userMsg;
+        document.getElementById('user-msg-time').innerText = data.time;
+
+        gsap.fromTo(userBubble, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.25 });
+
+        setTimeout(() => {
+          typingBubble.classList.remove('active');
+          aiBubble.style.display = 'flex';
+          document.getElementById('ai-msg-text').innerText = data.aiMsg;
+          document.getElementById('wa-doc-filename').innerText = data.cite;
+
+          gsap.fromTo(aiBubble, { opacity: 0, y: 10, scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: 'back.out(1.2)' });
+        }, 400);
+
+      } else {
+        document.getElementById('user-sender-name').innerText = data.sender;
+        document.getElementById('user-msg-text').innerText = data.userMsg;
+        document.getElementById('user-msg-time').innerText = data.time;
+        document.getElementById('ai-msg-text').innerText = data.aiMsg;
+        document.getElementById('wa-doc-filename').innerText = data.cite;
+        aiBubble.style.display = 'flex';
+        typingBubble.classList.remove('active');
+      }
+    }
+
+    function cycleDepartment(withAnim = true) {
+      currentChatIdx = (currentChatIdx + 1) % deptChats.length;
+      switchDeptChat(currentChatIdx, withAnim);
+    }
+
+    function testShieldUnknown() {
+      const av = document.getElementById('main-avatar');
+      av.className = 'main-chat-avatar warehouse';
+      av.innerHTML = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 10c0-3.771 0-5.657 1.172-6.828S7.229 2 11 2h2c3.771 0 5.657 0 6.828 1.172S21 6.229 21 10v4c0 3.771 0 5.657-1.172 6.828S16.771 22 13 22h-2c-3.771 0-5.657 0-6.828-1.172S3 17.771 3 14z" opacity=".5"/><path fill="currentColor" fill-rule="evenodd" d="M7.25 12a.75.75 0 0 1 .75-.75h8a.75.75 0 0 1 0 1.5H8a.75.75 0 0 1-.75-.75m0-4A.75.75 0 0 1 8 7.25h8a.75.75 0 0 1 0 1.5H8A.75.75 0 0 1 7.25 8m0 8a.75.75 0 0 1 .75-.75h5a.75.75 0 0 1 0 1.5H8a.75.75 0 0 1-.75-.75" clip-rule="evenodd"/></svg>';
+      document.getElementById('active-chat-title').innerText = 'ტენდერების განყოფილება';
+
+      const userBubble = document.getElementById('bubble-user');
+      const aiBubble = document.getElementById('bubble-ai');
+      const typingBubble = document.getElementById('typing-bubble');
+
+      aiBubble.style.display = 'none';
+      typingBubble.classList.add('active');
+
+      document.getElementById('user-sender-name').innerText = 'ლევანი (ტენდერების მენეჯერი)';
+      document.getElementById('user-msg-text').innerText = '«კლიენტი ითხოვს არასტანდარტულ კონტრაქტს 300 000 GEL-ზე 90-დღიანი გადავადებით. ვეთანხმებით?»';
+
+      setTimeout(() => {
+        typingBubble.classList.remove('active');
+        aiBubble.style.display = 'flex';
+        document.getElementById('ai-msg-text').innerText = '«კომპანიის რეგლამენტებში მსგავსი წესი არ არსებობს. მოთხოვნა გადაეგზავნა ხელმძღვანელს დიალოგის მოკლე შეჯამებასთან ერთად.»';
+        document.getElementById('wa-doc-filename').innerText = 'დაცვა_Shield_ესკალაცია_შეფთან.pdf';
+
+        gsap.fromTo(aiBubble, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 });
+      }, 400);
+    }
+
+    // Auto cycle every 6 seconds
+    setInterval(() => {
+      cycleDepartment(true);
+    }, 6000);
+  </script>
+</body>
+</html>
