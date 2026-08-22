@@ -18,6 +18,7 @@ export const FAMILY: readonly FamilyMember[] = [
   { key: "aicontent", domain: "aicontent.ge", label: "aiCONTENT.ge", live: true },
   { key: "aiads", domain: "aiads.ge", label: "aiADS.ge", live: true },
   { key: "aistaff", domain: "aistaff.ge", label: "aiSTAFF.ge", live: true },
+  { key: "aichats", domain: "aichats.ge", label: "aiCHATS.ge", live: true },
   { key: "iai", domain: "iai.ge", label: "iAI.ge", live: true },
   { key: "aitaxi", domain: "aitaxi.ge", label: "aiTAXI.ge", live: true },
   { key: "aiweb", domain: "aiweb.ge", label: "aiWEB.ge", live: true },
