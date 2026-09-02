@@ -60,15 +60,15 @@
   },
   "product": {
     "seo": {
-      "title": "aiBRAIN, One Source of Truth for Business AI Assistants",
-      "description": "aiBRAIN brings your information, policies and prices together so connected AI assistants can give one approved answer in every channel without hallucination."
+      "title": "aiBRAIN: company knowledge base and AI model",
+      "description": "aiBRAIN brings company information, policies, and prices into one knowledge base so connected AI assistants can prepare approved answers across channels."
     },
     "hero": {
       "audience": "For small and medium business owners, customer support and sales leaders",
-      "owner": "One business brain for every",
-      "role": "customer conversation",
+      "owner": "Your company knowledge base in",
+      "role": "BRAIN",
       "lead": "One source of truth for your business",
-      "sub": "aiBRAIN brings your information, policies and prices together so connected AI assistants can give one approved answer in every channel.",
+      "sub": "aiBRAIN is a company knowledge base that brings your information, policies, and prices together so employees and connected AI assistants can use the same approved sources.",
       "taglinePrefix": "One source · five channels · a human for uncertain cases",
       "taglineWorks": "manages",
       "typewriterWords": "aiBRAIN,knowledge base,rules center,product catalog,pricing bank",
