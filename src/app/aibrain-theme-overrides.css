@@ -1,0 +1,28 @@
+.aibrain-product {
+  --brain-brand: #6366f1;
+  --brain-accent: #4338ca;
+  --brain-soft: #e0e7ff;
+  --primary: #6366f1;
+  --primary-foreground: #fff;
+  /* Tailwind v4 utilities read these scoped tokens, preserving native variants and opacity. */
+  --color-blue-50: var(--brain-soft); --color-blue-100: var(--brain-soft); --color-blue-200: var(--brain-soft); --color-blue-300: var(--brain-soft); --color-blue-400: var(--brain-soft); --color-blue-500: var(--brain-brand); --color-blue-600: var(--brain-brand); --color-blue-700: var(--brain-brand); --color-blue-800: var(--brain-brand); --color-blue-900: var(--brain-brand); --color-blue-950: var(--brain-brand);
+  --color-indigo-50: var(--brain-soft); --color-indigo-100: var(--brain-soft); --color-indigo-200: var(--brain-soft); --color-indigo-300: var(--brain-soft); --color-indigo-400: var(--brain-soft); --color-indigo-500: var(--brain-brand); --color-indigo-600: var(--brain-brand); --color-indigo-700: var(--brain-brand); --color-indigo-800: var(--brain-brand); --color-indigo-900: var(--brain-brand); --color-indigo-950: var(--brain-brand);
+  --color-purple-50: var(--brain-soft); --color-purple-100: var(--brain-soft); --color-purple-200: var(--brain-soft); --color-purple-300: var(--brain-soft); --color-purple-400: var(--brain-soft); --color-purple-500: var(--brain-brand); --color-purple-600: var(--brain-brand); --color-purple-700: var(--brain-brand); --color-purple-800: var(--brain-brand); --color-purple-900: var(--brain-brand); --color-purple-950: var(--brain-brand);
+  --color-pink-50: var(--brain-soft); --color-pink-100: var(--brain-soft); --color-pink-200: var(--brain-soft); --color-pink-300: var(--brain-soft); --color-pink-400: var(--brain-soft); --color-pink-500: var(--brain-brand); --color-pink-600: var(--brain-brand); --color-pink-700: var(--brain-brand); --color-pink-800: var(--brain-brand); --color-pink-900: var(--brain-brand); --color-pink-950: var(--brain-brand);
+  --color-emerald-50: var(--brain-soft); --color-emerald-100: var(--brain-soft); --color-emerald-200: var(--brain-soft); --color-emerald-300: var(--brain-soft); --color-emerald-400: var(--brain-soft); --color-emerald-500: var(--brain-brand); --color-emerald-600: var(--brain-brand); --color-emerald-700: var(--brain-brand); --color-emerald-800: var(--brain-brand); --color-emerald-900: var(--brain-brand); --color-emerald-950: var(--brain-brand);
+  --color-cyan-50: var(--brain-soft); --color-cyan-100: var(--brain-soft); --color-cyan-200: var(--brain-soft); --color-cyan-300: var(--brain-soft); --color-cyan-400: var(--brain-soft); --color-cyan-500: var(--brain-brand); --color-cyan-600: var(--brain-brand); --color-cyan-700: var(--brain-brand); --color-cyan-800: var(--brain-brand); --color-cyan-900: var(--brain-brand); --color-cyan-950: var(--brain-brand);
+  --color-sky-50: var(--brain-soft); --color-sky-100: var(--brain-soft); --color-sky-200: var(--brain-soft); --color-sky-300: var(--brain-soft); --color-sky-400: var(--brain-soft); --color-sky-500: var(--brain-brand); --color-sky-600: var(--brain-brand); --color-sky-700: var(--brain-brand); --color-sky-800: var(--brain-brand); --color-sky-900: var(--brain-brand); --color-sky-950: var(--brain-brand);
+  --color-orange-50: var(--brain-soft); --color-orange-100: var(--brain-soft); --color-orange-200: var(--brain-soft); --color-orange-300: var(--brain-soft); --color-orange-400: var(--brain-soft); --color-orange-500: var(--brain-brand); --color-orange-600: var(--brain-brand); --color-orange-700: var(--brain-brand); --color-orange-800: var(--brain-brand); --color-orange-900: var(--brain-brand); --color-orange-950: var(--brain-brand);
+  --color-rose-50: var(--brain-soft); --color-rose-100: var(--brain-soft); --color-rose-200: var(--brain-soft); --color-rose-300: var(--brain-soft); --color-rose-400: var(--brain-soft); --color-rose-500: var(--brain-brand); --color-rose-600: var(--brain-brand); --color-rose-700: var(--brain-brand); --color-rose-800: var(--brain-brand); --color-rose-900: var(--brain-brand); --color-rose-950: var(--brain-brand);
+}
+/* Keep source light accents, but let dark semantic roles win only in their real state. */
+.dark .aibrain-product [class~="dark:text-white"] { color: #ffffff !important; }
+.dark .aibrain-product .group:hover [class~="dark:group-hover:text-blue-400"],
+.dark .aibrain-product .group:hover [class~="dark:group-hover:text-cyan-400"],
+.dark .aibrain-product .group:hover [class~="dark:group-hover:text-emerald-400"],
+.dark .aibrain-product .group:hover [class~="dark:group-hover:text-orange-400"],
+.dark .aibrain-product .group:hover [class~="dark:group-hover:text-pink-400"],
+.dark .aibrain-product .group:hover [class~="dark:group-hover:text-purple-400"],
+.dark .aibrain-product .group\/item:hover [class~="dark:group-hover/item:text-blue-400"] { color: var(--brain-soft) !important; }
+.aibrain-product [class~="bg-orange-500"][class~="text-white"] { --color-orange-500: var(--brain-brand); }
+.aibrain-product .ainow-btn-primary, .aibrain-product .ainow-model-stage__status { background-color: var(--brain-brand) !important; }
