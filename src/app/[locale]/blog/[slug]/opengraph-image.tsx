@@ -1,4 +1,5 @@
 import { ImageResponse } from 'next/og';
+import { ogFonts } from '@/features/blog/lib/georgian-font';
 
 import { SITE } from '@/config/site';
 import { getPost } from '@/features/blog/lib/blog';
@@ -23,12 +24,12 @@ export default async function OpenGraphImage({ params }: { params: Promise<{ loc
         padding: '62px 72px',
         background: `radial-gradient(circle at 12% 18%, ${SITE.brandHex}44 0, transparent 42%), #fbfcfc`,
         color: '#111827',
-        fontFamily: 'Arial, sans-serif',
+        fontFamily: 'Noto Sans Georgian',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', fontWeight: 900, fontSize: 44 }}>
-          <span style={{ color: '#7c3aed', fontFamily: 'monospace' }}>ai</span>
+          <span style={{ color: '#7c3aed' }}>ai</span>
           <span style={{ color: SITE.brandHex }}>{SITE.wordmark.mark}</span>
         </div>
         <div style={{ display: 'flex', padding: '10px 18px', borderRadius: 999, border: `2px solid ${SITE.brandHex}66`, color: '#344054', fontSize: 22 }}>
@@ -43,6 +44,11 @@ export default async function OpenGraphImage({ params }: { params: Promise<{ loc
         <span>aiNOW</span>
       </div>
     </div>,
-    size,
+    { ...size, fonts: ogFonts.map((font, index) => ({
+      ...font,
+      // Satori selects one face per family/weight; separate subset families
+      // keep Georgian and Latin glyphs both available for offline fallback.
+      name: index === 0 ? 'Noto Sans Georgian' : 'Noto Sans Latin',
+    })) },
   );
 }
